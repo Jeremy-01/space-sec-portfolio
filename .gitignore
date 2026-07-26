@@ -1,0 +1,27 @@
+# 大体积 RF 采集文件（只提交元数据与截图，不提交原始 IQ/音频）
+phase-b-rf/captures/*.iq
+phase-b-rf/captures/*.wav
+phase-b-rf/captures/*.ogg
+phase-b-rf/captures/*.raw
+phase-b-rf/captures/*.cfile
+*.dat
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# OS
+.DS_Store
+
+# 工具运行时产生的日志（ccsdspy 会在 cwd 写 ccsdspy.log）
+*.log
+
+# 本地编辑器/助手配置（因人而异，不入库）
+.claude/settings.local.json
+
+# CTF 题目二进制/环境（按需保留，默认不提交大文件）
+*.bin
+*.elf
