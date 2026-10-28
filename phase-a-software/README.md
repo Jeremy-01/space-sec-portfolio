@@ -28,7 +28,10 @@
 - 字段级解析用 [ccsdspy](https://docs.ccsdspy.org/)，见 [M1 手册 §5](M1-playbook.md)
 
 ## 进度
-- [ ] 搭好本地练习环境（[M1 手册](M1-playbook.md) §0–1，比 [setup.md](../docs/setup.md) 更细）
-- [ ] 第一题类通关 + writeup（M1：信号→帧→遥测，主攻 2023 FAUXY Lady）
+- [x] 搭好本地练习环境（[M1 手册](M1-playbook.md) §0–1，比 [setup.md](../docs/setup.md) 更细）
+- [x] 第一题类通关 + writeup（M1：信号→帧→遥测，主攻 2023 FAUXY Lady）✅ 2026-10-29
+  - ✅ [writeup 已填实](writeups/2023-fauxy-lady.md)：generator 等价路线生成信号 → 自研 numpy solver（频偏校正/RRC/定时/差分译码）→ ASM 切帧 → CRC PASS，重建遥测载荷成功（「AI 运用」含 4 条 AI 出错记录）
+  - ✅ 解题脚本：[solutions/2023-fauxy-lady/solve_fauxy.py](solutions/2023-fauxy-lady/solve_fauxy.py)
+  - 🕳️ [M1 踩坑沉淀](M1-pitfalls.md)：累计 6 条真实坑（docker 等价路线、float WAV、0/π 判决、双长度解析、谱线≠载波等）
 - [ ] 2–3 题类成系列
 - [ ] 报名一场 CTF

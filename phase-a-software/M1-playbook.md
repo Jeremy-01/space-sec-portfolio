@@ -166,6 +166,9 @@ open static/tlm_def.pdf # 先读遥测定义
 ## 3. 本地起题（每题 20–40 分钟）
 
 > 以下命令摘自 `hackasat-qualifier-2023/README.md` 官方原文。**未在本机实测**（需 Docker Desktop 运行），首次执行时以各题目录自己的 `README.md` 为准。
+>
+> 🚦 **做 FAUXY Lady 的最短路径**：§3.0 装 socat（其实也可跳过——本题不起服务）→ **直接 §3.3**。
+> §3.1 的 base 镜像与 §3.4–3.7 的服务化流程对本题都用不上。
 
 ### 3.0 先装 socat
 
@@ -175,19 +178,56 @@ open static/tlm_def.pdf # 先读遥测定义
 brew install socat
 ```
 
-### 3.1 先建基础镜像（只需一次）
+### 3.1 基础镜像 —— ⏭️ **M1 默认跳过，直接看 §3.3**
 
-部分题目容器依赖预建的基础镜像（pyctf / phased_array / generator-base）：
+> ✅ **主攻题 FAUXY Lady 不需要任何 base 镜像**，QAM、Dashing 也不需要。
+> 已实测：跑 `base_challenge/build.sh` 会失败，而且**跑它对 M1 毫无用处**。直接跳到 §3.3。
+
+M1 题单的实际依赖（`grep '^FROM' */Dockerfile` 实测）：
+
+| 题目 | generator / solver 的 FROM | 需要 base？ |
+|---|---|---|
+| **FAUXY Lady**（主攻） | `ubuntu:22.04` × 2 | ❌ **不需要** |
+| QAM | `ubuntu:22.04` × 2 | ❌ 不需要 |
+| Dashing | `python:3` / `python:3.10` | ❌ 不需要 |
+| Dark Side of the Dishy（拉伸 5/5） | generator = `has4/quals/challenges/ctfphasedarray` | ✅ 需要 |
+
+**换一道题时怎么自查**（一条命令）：
+
+```bash
+grep -h '^FROM' <题目目录>/*/Dockerfile
+# 出现 has4/quals/... → 需要先建 base
+# 全是 ubuntu:/python: → 直接 make build
+```
+
+<details>
+<summary>只有要做 Dishy 时才展开：如何建 base（已知会失败）</summary>
 
 ```bash
 cd ~/E/code/ctf/hackasat/hackasat-qualifier-2023
-pushd challenges/base_challenge/     # ⚠️ 是 base_challenge（单数），官方 README 里写成了复数
+pushd challenges/base_challenge/    # ⚠️ 是 base_challenge（单数），官方 README 写成了复数
 ./build.sh
 popd
-
-# 验证：应有 ≥7 个镜像
-docker images | grep -i 'has4/quals/challenges/ctf' | wc -l
+docker images | grep -i 'has4/quals/challenges/ctf' | wc -l    # 官方称应有 ≥7
 ```
+
+**实测失败**，报错形如：
+
+```
+E: Failed to fetch http://ports.ubuntu.com/.../python3-minimal_3.8.2-0ubuntu2_arm64.deb  502
+ERROR: process "/bin/sh -c apt-get update -y && ... python-dev ..." exit code: 100
+```
+
+三层原因（详见 [M1-pitfalls.md](M1-pitfalls.md) 坑 1）：
+
+1. `phased_array_base` 与 `pyctf_base` 都是 `FROM ubuntu:focal`（20.04，**已 EOL**）
+2. 安装列表含 **`python-dev`** —— Python 2 的开发包，focal 里已废弃，网络正常也大概率装不上
+3. Apple Silicon 拉 `ports.ubuntu.com` 的 arm64 包，该源返回 502
+
+**这是 2023 年赛题的历史包袱，不是你的环境问题。** 若非做 Dishy 不可，可试（均未实测）：
+`--platform linux/amd64` 走模拟；把 Dockerfile 里的 `python-dev` 删掉或换成 `python3-dev`；换 apt 镜像源。
+
+</details>
 
 ### 3.2 理解三件套
 
@@ -557,12 +597,12 @@ cp phase-a-software/writeups/_TEMPLATE.md \
 ## 8. 交付物清单
 
 - [ ] `phase-a-software/env.md` —— 环境版本（§1 生成）
-- [ ] `writeups/2023-fauxy-lady.md` —— **M1 核心交付**，写透一篇
+- [x] `writeups/2023-fauxy-lady.md` —— **M1 核心交付**，写透一篇 ✅ 2026-10-29 全链路实做完成
 - [ ] （可选）QAM / Dashing / Doppler 各一篇短 writeup，凑成题类系列
-- [ ] `solutions/<题目名>/` —— 可复现的解题脚本（含解调流图与切帧脚本）
-- [ ] 每篇 writeup 的「AI 运用」节完整（含至少一条 AI 出错记录）
-- [ ] 更新 `phase-a-software/README.md` 进度勾选
-- [ ] 做完后沉淀 `M1-pitfalls.md`（照 M0 的体例，等有真实踩坑再写）
+- [x] `solutions/2023-fauxy-lady/` —— 可复现的解题脚本（`solve_fauxy.py`：频偏校正→RRC→定时→差分译码→切帧→CRC）
+- [x] writeup「AI 运用」节完整（✅ 含 4 条 AI 出错记录；AI-as-subject 实验待下一轮）
+- [x] 更新 `phase-a-software/README.md` 进度勾选
+- [x] `M1-pitfalls.md` 已沉淀 6 条真实坑
 
 ---
 
@@ -573,9 +613,13 @@ cp phase-a-software/writeups/_TEMPLATE.md \
 | 症状 | 最可能原因 | 处理 |
 |---|---|---|
 | `docker: Cannot connect to the Docker daemon` | Docker Desktop 没启动 | 打开 Docker Desktop App，等鲸鱼图标稳定 |
-| `make challenge` 报 socat not found | macOS 默认没有 socat | `brew install socat`（§3.0） |
-| 构建报找不到基础镜像 | base_challenge 没先建 | `pushd challenges/base_challenge/ && ./build.sh && popd`（§3.1） |
+| `make challenge` 报 socat not found | macOS 默认没有 socat | `brew install socat`（§3.0）；FAUXY Lady 用不到 |
+| `base_challenge/build.sh` 报 apt 502 / exit code 100 | ✅**实测坑**：base 是 EOL 的 `ubuntu:focal` + 含废弃包 `python-dev`，arm64 源不稳 | **先确认题目真需要它**——M1 只有 Dishy 需要，其余跳过（§3.1、[pitfalls 坑 1](M1-pitfalls.md)） |
+| `docker images \| grep has4 \| wc -l` 返回 0 | base 未建成 | 同上；不影响 FAUXY Lady / QAM / Dashing |
 | 题目容器起来就退出 | 缺 SEED/FLAG 环境变量 | 自己指定 `-e SEED=1234 -e FLAG=flag{test}`（§3.6） |
+| 本机没有 docker，`make generator` 跑不了 | ✅**实测坑**：容器只是打包，信号生成本身只依赖两条 python 命令 | 直接跑 `packets.py` + `satsig.py`（grsat 环境），见 [pitfalls 坑 2](M1-pitfalls.md) |
+| `wave.Error: unknown format: 3` | ✅**实测坑**：GNU Radio 写 IEEE float WAV，`wave` 只认 PCM | 用 `scipy.io.wavfile`，双声道即 I/Q（pitfalls 坑 3） |
+| 解调比特全是碎 run、搜不到 ASM | ✅**实测坑**：差分译码门限错（`angle>0`），或长度字段按 32 bit 切 | 0/π 门限 `u.real<0`；长度取 16 bit、第二遍做校验（pitfalls 坑 4/5） |
 | 题目没反应/像是崩了 | 容器内异常 | **看同目录的 `log` 文件**——socat 把输出都写那儿（§3.4） |
 | 镜像构建慢/拉不动 | 网络 | 配 Docker 镜像加速器，或走离线路线（§3.6 绕法 3） |
 | Apple Silicon 上镜像跑不起来 | 镜像是 amd64 的 | `docker run --platform linux/amd64 ...` |
