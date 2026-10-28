@@ -1,0 +1,4 @@
+[submodule "hackasat-qualifier-2023"]
+	path = phase-a-software/challenges/hackasat-qualifier-2023
+	url = https://github.com/cromulencellc/hackasat-qualifier-2023.git
+	shallow = true

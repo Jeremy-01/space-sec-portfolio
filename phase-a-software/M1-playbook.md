@@ -11,6 +11,7 @@
 > cd ~/E/code/space-sec-portfolio
 > ```
 > 题目仓库在 `~/E/code/ctf/hackasat/`（已 clone 2022 + 2023）。
+> 2023 届在本库内也有 submodule 副本（`challenges/hackasat-qualifier-2023`，`git submodule update --init` 拉取）；本手册命令沿用本地路径写法。
 
 ## ⚠️ 为什么不是"纯 CCSDS 题类"
 

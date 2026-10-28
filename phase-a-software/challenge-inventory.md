@@ -3,6 +3,7 @@
 > 📍 [作品集首页](../README.md) › [阶段 A](README.md) › **题目清点**
 
 > 实地清点于 2026-07-26，基于本地 clone 的仓库：`~/E/code/ctf/hackasat/`
+> 📦 2023 届题目仓库已作为 git submodule 挂在本库：`phase-a-software/challenges/hackasat-qualifier-2023`（浅克隆，指向官方 [cromulencellc/hackasat-qualifier-2023](https://github.com/cromulencellc/hackasat-qualifier-2023)，clone 本库后执行 `git submodule update --init` 获取）。
 > 数据来源：各仓库根 README 的官方映射表 + 每题 `README.md` 的 Category/Difficulty 字段。
 > 用途：M1 选题决策依据（见 [M1-playbook.md](M1-playbook.md) §2），免得重复清点。
 
